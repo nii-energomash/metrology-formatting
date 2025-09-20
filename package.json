@@ -1,6 +1,6 @@
 {
   "name": "@andrey-aka-skif/custom-formatting",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Форматирование входных значений по указанным правилам (метрологическим и т.д.)",
   "keywords": [
     "formatting",
