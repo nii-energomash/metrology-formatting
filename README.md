@@ -84,3 +84,5 @@
 | 0.0282           | "2,82·10⁻²" |
 | 100 (процент)    | "100,0%"    |
 | 0.03 (процент)   | "0,0%"      |
+
+[![CI/CD Pipeline](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml)
