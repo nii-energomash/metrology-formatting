@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Continuous Integration
+
+on:
+    push:
+        branches: ['**']
+    workflow_call: {}
+    workflow_dispatch:
+
+jobs:
+    run-ci:
+        runs-on: ubuntu-latest
+        container:
+          image: node:20-bullseye
+
+        steps:
+          - name: 🛒 Checkout
+            uses: actions/checkout@v4
+
+          - name: ✨ Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+                node-version: '20'
+                cache: 'npm'
+
+          - name: 📦 Install dependencies
+            run: npm ci
+
+          - name: 🏗️ Build and cache
+            id: cache-build
+            uses: actions/cache@v4
+            with:
+              path: dist/
+              key: build-${{ gitea.sha }}-${{ hashFiles('src/**', 'package.json') }}
+              restore-keys: |
+                build-
+
+          - name: 🛠️ Build if cache missed
+            if: steps.cache-build.outputs.cache-hit != 'true'
+            run: npm run build
+
+          - name: 🧪 Run tests
+            run: npm test

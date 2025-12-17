@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Build Docker Image
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+jobs:
+  ci:
+    uses: './.gitea/workflows/ci.yml'
+
+  publish:
+    needs: ci
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-bullseye
+
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📥 Restore build from cache
+        id: restore-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: dist/
+          key: build-${{ gitea.sha }}-${{ hashFiles('src/**', 'package.json') }}
+          restore-keys: |
+            build-
+
+      - name: ✅ Verify build exists
+        run: |
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist/)" ]; then
+            echo "❌ Build directory is empty or missing"
+            exit 1
+          fi
+          echo "✅ Build found in dist/"
+
+      - name: 🔑 Configure NPM Registry for Gitea
+        run: |
+          npm config set @nii-energomash:registry=http://192.168.1.149:3000/api/packages/andrey-aka-skif/npm/
+          npm config set -- '//192.168.1.149:3000/api/packages/andrey-aka-skif/npm/:_authToken' "${{ secrets.PACKAGES_TOKEN }}"
+        env:
+          GITEA_PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+
+      - name: 🚀 Publish package to Gitea Registry
+        run: npm publish
