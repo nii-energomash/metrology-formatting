@@ -14,45 +14,45 @@ export default class FormattedNumber extends BaseNumericFormattedValue {
         const absValue = Math.abs(this.numericValue)
 
         if (absValue === 0) {
-            this.#calculateSimpleStandartForm(this.numericValue, 3)
+            this.#calculateSimpleStandardForm(this.numericValue, 3)
             return
         }
 
         const valueLessThanOneTenth = this._roundTo(absValue, 2)
         if (valueLessThanOneTenth < 0.1) {
-            this.#calculateStandartForm(absValue)
+            this.#calculateStandardForm(absValue)
             return
         }
 
         const valueLessThanOne = this._roundTo(absValue, 3)
         if (valueLessThanOne < 1) {
-            this.#calculateSimpleStandartForm(valueLessThanOne, 3)
+            this.#calculateSimpleStandardForm(valueLessThanOne, 3)
             return
         }
 
         const valueLessThanTen = this._roundTo(absValue, 2)
         if (valueLessThanTen < 10) {
-            this.#calculateSimpleStandartForm(valueLessThanTen, 2)
+            this.#calculateSimpleStandardForm(valueLessThanTen, 2)
             return
         }
 
         const valueLessThanHundred = this._roundTo(absValue, 1)
         if (valueLessThanHundred < 100) {
-            this.#calculateSimpleStandartForm(valueLessThanHundred, 1)
+            this.#calculateSimpleStandardForm(valueLessThanHundred, 1)
             return
         }
 
         const valueLessThanThousand = this._roundTo(absValue, 0)
         if (valueLessThanThousand < 1000) {
-            this.#calculateSimpleStandartForm(valueLessThanThousand, 0)
+            this.#calculateSimpleStandardForm(valueLessThanThousand, 0)
             return
         }
 
         const valueMoreThanThousand = this._roundTo(absValue, 0)
-        this.#calculateStandartForm(valueMoreThanThousand)
+        this.#calculateStandardForm(valueMoreThanThousand)
     }
 
-    #calculateStandartForm(value) {
+    #calculateStandardForm(value) {
         if (value === 0)
             throw new Error("Невозможно представить ноль в стандартном виде")
 
@@ -80,7 +80,7 @@ export default class FormattedNumber extends BaseNumericFormattedValue {
         this.#exponent = exponent
     }
 
-    #calculateSimpleStandartForm(value, decimalPlaces = 0) {
+    #calculateSimpleStandardForm(value, decimalPlaces = 0) {
         this.#sign = Math.sign(this.numericValue)
         this.#mantissa = Math.abs(value)
         this.#decimalPlaces = decimalPlaces

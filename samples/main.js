@@ -12,8 +12,8 @@ const exponentNode = document.querySelector('#exponent')
 
 input.addEventListener('input', () => {
   const percentagesString = FormattingUtility.toPercentageString(input.value)
-  const numberString = FormattingUtility.toStandartFormString(input.value)
-  const numberOnject = FormattingUtility.toStandartFormObject(input.value)
+  const numberString = FormattingUtility.toStandardFormString(input.value)
+  const numberOnject = FormattingUtility.toStandardFormObject(input.value)
 
   formattedNumberNode.innerHTML = numberString
   formattedPercentageNode.innerHTML = percentagesString

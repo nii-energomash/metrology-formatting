@@ -20,7 +20,7 @@ export default class FormattingUtility {
      * @param {*} number Значение для форматирования
      * @returns Строка в стандартном виде
      */
-    static toStandartFormString(number) {
+    static toStandardFormString(number) {
         const formattedNumber = new FormattedNumber(number)
         return formattedNumber.toString()
     }
@@ -30,7 +30,7 @@ export default class FormattingUtility {
      * @param {*} number Значение для форматирования
      * @returns Объект в стандартном виде { sign, mantissa, base, exponent }, содержащий строки
      */
-    static toStandartFormObject(number) {
+    static toStandardFormObject(number) {
         const formattedNumber = new FormattedNumber(number)
         return formattedNumber.toObjectValue()
     }
