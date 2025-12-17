@@ -1,4 +1,8 @@
 # FormattingUtility
+
+[![License](https://img.shields.io/static/v1?label=license&message=proprietary&color=blue)](https://github.com/andrey-aka-skif/kdepa-api/blob/master/LICENSE)
+[![CI/CD Pipeline](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml)
+
 Содержит функции для форматирования входных значений по определенным правилам:
 - форматирование числового значения и возврат его строкового представления по правилам метрологии
 - форматирование числового значения и возврат его объектного представления по правилам метрологии
@@ -84,5 +88,3 @@
 | 0.0282           | "2,82·10⁻²" |
 | 100 (процент)    | "100,0%"    |
 | 0.03 (процент)   | "0,0%"      |
-
-[![CI/CD Pipeline](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml)
