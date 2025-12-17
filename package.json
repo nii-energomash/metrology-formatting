@@ -1,11 +1,15 @@
 {
   "name": "@nii-energomash/custom-formatting",
-  "version": "2.0.0",
+  "version": "2.0.4",
   "description": "Форматирование входных значений по указанным правилам (метрологическим и т.д.)",
   "keywords": [
     "formatting",
     "metrology"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nii-energomash/custom-formatting"
+  },
   "type": "module",
   "exports": {
     ".": {
