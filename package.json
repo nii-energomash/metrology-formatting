@@ -1,6 +1,6 @@
 {
-  "name": "@andrey-aka-skif/custom-formatting",
-  "version": "1.0.4",
+  "name": "@nii-energomash/custom-formatting",
+  "version": "2.0.0",
   "description": "Форматирование входных значений по указанным правилам (метрологическим и т.д.)",
   "keywords": [
     "formatting",
