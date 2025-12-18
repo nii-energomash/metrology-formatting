@@ -1,7 +1,7 @@
 {
   "name": "@nii-energomash/metrology-formatting",
   "version": "2.0.1",
-  "description": "Форматирование входных значений по указанным правилам (метрологическим и т.д.)",
+  "description": "Форматирование чисел по метрологическим правилам",
   "keywords": [
     "formatting",
     "metrology"
