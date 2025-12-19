@@ -18,6 +18,21 @@ jobs:
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Извлечь версию из тега
+        id: get-version
+        run: |
+          # Удаляем префикс 'v' из тега
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📌 Версия из тега: ${VERSION}"
+
+      - name: 📝 Обновить версию в package.json
+        run: |
+          npm version ${{ steps.get-version.outputs.version }} --no-git-tag-version --allow-same-version
+          echo "✅ Версия обновлена в package.json"
 
       - name: 📥 Restore build from cache
         id: restore-cache
