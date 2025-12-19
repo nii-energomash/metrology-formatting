@@ -42,8 +42,6 @@ jobs:
         run: |
           npm config set @nii-energomash:registry=https://192.168.100.252:3000/api/packages/usov-andrey/npm/
           npm config set -- '//192.168.100.252:3000/api/packages/usov-andrey/npm/:_authToken' "${{ secrets.PACKAGES_TOKEN }}"
-        env:
-          GITEA_PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
 
       - name: 🚀 Publish package to Gitea Registry
         run: npm publish
