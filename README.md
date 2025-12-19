@@ -1,23 +1,44 @@
 # FormattingUtility
 
-[![License](https://img.shields.io/static/v1?label=license&message=proprietary&color=blue)](https://github.com/andrey-aka-skif/kdepa-api/blob/master/LICENSE)
-[![CI/CD Pipeline](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/andrey-aka-skif/custom-formatting/actions/workflows/ci-cd.yml)
+Форматирование чисел по правилам метрологии: стандартная форма, объектное представление и проценты.
 
-Содержит функции для форматирования входных значений по определенным правилам:
+[![License](https://img.shields.io/static/v1?label=license&message=proprietary&color=blue)](https://github.com/nii-energomash/metrology-formatting/blob/master/LICENSE)
+[![CI](https://github.com/nii-energomash/metrology-formatting/actions/workflows/ci.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/ci.yml)
+[![Package](https://github.com/nii-energomash/metrology-formatting/actions/workflows/package.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/package.yml)
 
-- форматирование числового значения и возврат его строкового представления по правилам метрологии
-- форматирование числового значения и возврат его объектного представления по правилам метрологии
-- форматирование числового значения и возврат его строкового процентного представления по правилам метрологии
+Библиотека для строгого форматирования числовых значений в научной и метрологической практике. Гарантирует три значащих цифры в выводе и корректное представление процентов.
 
-## toStandardFormString()
+## Установка
+
+```shell
+npm install @nii-energomash/metrology-formatting@latest
+```
+
+## Быстрый старт
+
+```js
+import { FormattingUtility } from '@nii-energomash/metrology-formatting'
+
+// Форматирование в строку по правилам метрологии
+console.log(FormattingUtility.toStandardFormString(4520)) // "4,52·10³"
+console.log(FormattingUtility.toStandardFormString(0.0282)) // "2,82·10⁻²"
+
+// Форматирование процентов
+console.log(FormattingUtility.toPercentageString(65.432)) // "65,4%"
+console.log(FormattingUtility.toPercentageString(0.03)) // "0,0%" (правило < 0.05%)
+```
+
+## API
+
+### toStandardFormString(value: number): string
 
 Функция принимает числовое значение и возвращает его строковое представление по правилам метрологии:
 
-### Общий принцип
+#### Общий принцип
 
 Функция всегда сохраняет три значащих цифры в выходной строке. Формат представления зависит от абсолютного значения входного числа.
 
-### Алгоритм работы
+#### Алгоритм работы
 
 Для чисел ≥1000:
 
@@ -55,7 +76,7 @@
 
 Пример: 0.0282 → "2,82·10⁻²"
 
-## toStandardFormObject()
+### toStandardFormObject(value: number): StandardFormObject
 
 Функция принимает числовое значение и обрабатывает его по тем же правилам, что и toStandadtFormString(). Но возвращает объект вида:
 
@@ -68,7 +89,7 @@
 }
 ```
 
-## toPercentageString()
+### toPercentageString(value: number): string
 
 Функция принимает числовое значение и обрабатывает его по правилам метрологии для процентов:
 
@@ -96,3 +117,52 @@
 | 0.0282           | "2,82·10⁻²" |
 | 100 (процент)    | "100,0%"    |
 | 0.03 (процент)   | "0,0%"      |
+
+## Разработка и тестирование
+
+### Клонирование репозитория
+
+```shell
+git clone https://github.com/nii-energomash/metrology-formatting.git
+cd metrology-formatting
+```
+
+### Установка зависимостей
+
+```shell
+npm install
+```
+
+### Запуск демонстрационной страницы (семплов)
+
+```shell
+npm run dev
+```
+
+### Запуск тестов
+
+```shell
+npm run test
+```
+
+### Запуск тестов с UI
+
+```shell
+npm run test:ui
+```
+
+### Запуск линтера
+
+```shell
+npm run lint
+```
+
+### Запуск форматирования
+
+```shell
+npm run format
+```
+
+## Лицензия
+
+Распространяется под проприетарной лицензией. Подробности в файле [LICENSE](./LICENSE).
