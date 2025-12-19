@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: dist/
-          key: build-${{ gitea.sha }}-${{ hashFiles('src/**', 'package.json') }}
+          key: build-${{ github.sha }}-${{ hashFiles('src/**', 'package.json') }}
           restore-keys: |
             build-
 
@@ -41,5 +41,5 @@ jobs:
           npm config set @nii-energomash:registry=https://npm.pkg.github.com
           npm config set -- '//npm.pkg.github.com/:_authToken' "${{ secrets.GH_PACKAGES_TOKEN }}"
 
-      - name: 🚀 Publish package to Gitea Registry
+      - name: 🚀 Publish package to Github Registry
         run: npm publish
