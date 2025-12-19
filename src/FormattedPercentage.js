@@ -14,7 +14,7 @@ export default class FormattedPercentage extends BaseNumericFormattedValue {
         try {
             this._ensureCalculateOrThrow()
             return this.numericValue.toFixed(1)
-        } catch (error) {
+        } catch {
             return ''
         }
     }

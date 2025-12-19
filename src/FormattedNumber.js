@@ -99,7 +99,7 @@ export default class FormattedNumber extends BaseNumericFormattedValue {
                 base: this.#base ? '10' : '',
                 exponent: this.#exponent ? this.#exponent.toString() : '',
             }
-        } catch (error) {
+        } catch {
             return {
                 sign: '',
                 mantissa: '',
