@@ -1,3 +1,3 @@
-import FormattingUtility from "./FormattingUtility"
+import FormattingUtility from './FormattingUtility'
 
 export { FormattingUtility }
