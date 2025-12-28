@@ -1,15 +1,16 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
-name: Build And Publish NPM Package
+name: Publish NPM Package on New Tag
 
 on:
   push:
     tags: ['v*.*.*']
-  workflow_dispatch:
 
 jobs:
   ci:
     uses: './.github/workflows/ci.yml'
+    with:
+      ref: ${{ github.ref }}
 
   publish:
     needs: ci
@@ -21,18 +22,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📦 Извлечь версию из тега
+      - name: 📦 Extract version from tag
         id: get-version
         run: |
-          # Удаляем префикс 'v' из тега
           VERSION="${GITHUB_REF#refs/tags/v}"
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "📌 Версия из тега: ${VERSION}"
 
-      - name: 📝 Обновить версию в package.json
+      - name: 📝 Update version in package.json
         run: |
           npm version ${{ steps.get-version.outputs.version }} --no-git-tag-version --allow-same-version
-          echo "✅ Версия обновлена в package.json"
+          echo "✅ Версия в package.json обновлена до ${{ steps.get-version.outputs.version }}"
 
       - name: 📥 Restore build from cache
         id: restore-cache
@@ -46,15 +46,19 @@ jobs:
       - name: ✅ Verify build exists
         run: |
           if [ ! -d "dist" ] || [ -z "$(ls -A dist/)" ]; then
-            echo "❌ Build directory is empty or missing"
+            echo "❌ Каталог сборки пуст или отсутствует"
             exit 1
           fi
-          echo "✅ Build found in dist/"
+          echo "✅ Сборка найдена в dist/"
 
-      - name: 🔑 Configure NPM Registry for Github
-        run: |
-          npm config set @nii-energomash:registry=https://npm.pkg.github.com
-          npm config set -- '//npm.pkg.github.com/:_authToken' "${{ secrets.GH_PACKAGES_TOKEN }}"
+      - name: ✨ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: '20'
+            registry-url: https://npm.pkg.github.com
+            scope: '@nii-energomash'
 
       - name: 🚀 Publish package to Github Registry
         run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
