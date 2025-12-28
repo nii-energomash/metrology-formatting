@@ -1,12 +1,12 @@
-# FormattingUtility
+# @nii-energomash/metrology-formatting
 
-Форматирование чисел по правилам метрологии: стандартная форма, объектное представление и проценты.
+Библиотека для строгого форматирования числовых значений по правилам метрологии: стандартная форма, объектное представление и проценты. Гарантирует три значащих цифры в выводе и корректное представление процентов.
 
 [![License](https://img.shields.io/static/v1?label=license&message=proprietary&color=blue)](https://github.com/nii-energomash/metrology-formatting/blob/master/LICENSE)
 [![CI](https://github.com/nii-energomash/metrology-formatting/actions/workflows/ci.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/ci.yml)
 [![Package](https://github.com/nii-energomash/metrology-formatting/actions/workflows/package.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/package.yml)
 
-Библиотека для строгого форматирования числовых значений в научной и метрологической практике. Гарантирует три значащих цифры в выводе и корректное представление процентов.
+Основной функционал доступен через класс `FormattingUtility`.
 
 ## Установка
 
