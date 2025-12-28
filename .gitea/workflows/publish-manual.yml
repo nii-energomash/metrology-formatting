@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Publish NPM Package Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Имя тега для сборки (например, v1.2.3)'
+        required: true
+        type: string
+      npm_tag:
+        description: 'npm dist-tag'
+        required: false
+        default: replay
+        type: string
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-bullseye
+    outputs:
+      ref: ${{ steps.set-ref.outputs.ref }}
+      version: ${{ steps.set-ref.outputs.version }}
+
+    steps:
+      - name: 🛒 Checkout (full)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Validate tag format
+        run: |
+          TAG="${{ inputs.tag }}"
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Неверный формат тега: $TAG"
+            echo "Ожидается: vMAJOR.MINOR.PATCH"
+            exit 1
+          fi
+          echo "✅ Формат тега OK: $TAG"
+        shell: bash
+
+      - name: 🔍 Validate tag exists
+        run: |
+          TAG="${{ inputs.tag }}"
+          if ! git show-ref --tags --quiet "refs/tags/$TAG"; then
+            echo "❌ Тег не существует: $TAG"
+            exit 1
+          fi
+          echo "✅ Тег существует: $TAG"
+
+      - name: 📦 Extract version and ref
+        id: set-ref
+        run: |
+          TAG="${{ inputs.tag }}"
+          VERSION="${TAG#v}"
+
+          echo "ref=refs/tags/$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          echo "📌 Используемый тег: $TAG"
+          echo "📦 Version: $VERSION"
+
+  ci:
+    needs: validate
+    uses: './.github/workflows/ci.yml'
+    with:
+      ref: ${{ needs.validate.outputs.ref }}
+
+  publish:
+    needs: [validate, ci]
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-bullseye
+
+    steps:
+      - name: 🛒 Checkout tag
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.validate.outputs.ref }}
+
+      - name: 📝 Update version in package.json
+        run: |
+          npm version ${{ needs.validate.outputs.version }} --no-git-tag-version --allow-same-version
+          echo "✅ Версия в package.json обновлена до ${{ needs.validate.outputs.version }}"
+
+      - name: 📥 Restore build from cache
+        id: restore-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: dist/
+          key: build-${{ gitea.sha }}-${{ hashFiles('src/**', 'package.json') }}
+          restore-keys: |
+            build-
+
+      - name: ✅ Verify build exists
+        run: |
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist/)" ]; then
+            echo "❌ Каталог сборки пуст или отсутствует"
+            exit 1
+          fi
+          echo "✅ Сборка найдена в dist/"
+
+      - name: ✨ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: '20'
+            registry-url: 'https://192.168.100.252:3000/api/packages/usov-andrey/npm/'
+            scope: '@nii-energomash'
+
+      - name: 🚀 Publish package to Gitea Registry
+        run: npm publish --tag "${{ inputs.npm_tag }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
