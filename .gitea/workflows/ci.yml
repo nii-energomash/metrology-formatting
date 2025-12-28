@@ -5,8 +5,13 @@ name: Continuous Integration
 on:
     push:
         branches: ['**']
-    workflow_call: {}
-    workflow_dispatch:
+    workflow_call:
+      inputs:
+        ref:
+          required: false
+          type: string
+          default: ''
+          description: 'Имя тега для сборки (например, v1.2.3), ветки или коммита. Если не указано, используется текущий ref'
 
 jobs:
     run-ci:
@@ -15,8 +20,16 @@ jobs:
           image: node:20-bullseye
 
         steps:
-          - name: 🛒 Checkout
+          - name: 🛒 Checkout with param
             uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+              ref: ${{ inputs.ref || github.ref }}
+
+          - name: Validate checked-out ref
+            run: |
+              git rev-parse HEAD
+              git status --porcelain
 
           - name: ✨ Setup Node.js
             uses: actions/setup-node@v4
