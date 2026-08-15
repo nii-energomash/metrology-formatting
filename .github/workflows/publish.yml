@@ -1,64 +1,74 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
-name: Publish NPM Package on New Tag
+# Публикация пакета в GitHub Packages. Версия берётся из git-тега vX.Y.Z
+# (в манифесте всегда 0.0.0).
+# Единственный триггер — publish GitHub Release: релиз это преднамеренный акт с
+# release notes, голый push тега НЕ публикует. Повторный прогон делается кнопкой
+# Re-run, добор невыпущенного тега — созданием релиза; переиздать уже выпущенную
+# версию нельзя, реестр не даёт перезаписать name@version.
+
+name: Publish
 
 on:
-  push:
-    tags: ['v*.*.*']
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  # Active LTS: с 28.10.2025, EOL 28.04.2028
+  NODE_VERSION: '24.x'
+  REGISTRY_URL: 'https://npm.pkg.github.com'
+  NPM_SCOPE: '@nii-energomash'
 
 jobs:
-  ci:
-    uses: './.github/workflows/ci.yml'
-    with:
-      ref: ${{ github.ref }}
-
   publish:
-    needs: ci
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛒 Checkout
-        uses: actions/checkout@v4
+      # fetch-depth: 0 — нужен полный список тегов: dist-tag latest достаётся
+      # только старшему из них (см. шаг «Версия и dist-tag из тега»).
+      - name: Checkout по тегу релиза
+        uses: actions/checkout@v7
         with:
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
-      - name: 📦 Extract version from tag
-        id: get-version
-        run: |
-          VERSION="${GITHUB_REF#refs/tags/v}"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "📌 Версия из тега: ${VERSION}"
-
-      - name: 📝 Update version in package.json
-        run: |
-          npm version ${{ steps.get-version.outputs.version }} --no-git-tag-version --allow-same-version
-          echo "✅ Версия в package.json обновлена до ${{ steps.get-version.outputs.version }}"
-
-      - name: 📥 Restore build from cache
-        id: restore-cache
-        uses: actions/cache/restore@v4
+      # registry-url + scope → setup-node пишет scoped-строку @nii-energomash:registry=…
+      # (не дефолтный реестр) и auth через NODE_AUTH_TOKEN. Committed .npmrc не нужен.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          path: dist/
-          key: build-${{ github.sha }}-${{ hashFiles('src/**', 'package.json') }}
-          restore-keys: |
-            build-
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          registry-url: ${{ env.REGISTRY_URL }}
+          scope: ${{ env.NPM_SCOPE }}
 
-      - name: ✅ Verify build exists
-        run: |
-          if [ ! -d "dist" ] || [ -z "$(ls -A dist/)" ]; then
-            echo "❌ Каталог сборки пуст или отсутствует"
-            exit 1
-          fi
-          echo "✅ Сборка найдена в dist/"
+      - name: Install dependencies
+        run: npm ci
 
-      - name: ✨ Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      # Шаг общий с зеркалом в Gitea, см. .ci/actions/prepare-npm-release.
+      - name: Версия и dist-tag из тега (манифест остаётся 0.0.0 в git)
+        id: release
+        uses: ./.ci/actions/prepare-npm-release
         with:
-          node-version: '22'
-          registry-url: https://npm.pkg.github.com
-          scope: '@nii-energomash'
+          tag: ${{ github.ref_name }}
+          prerelease: ${{ github.event.release.prerelease }}
 
-      - name: 🚀 Publish package to Github Registry
-        run: npm publish
+      - name: Build
+        run: npm run build
+
+      # Встроенный токен вместо PAT: он не истекает, не требует ручного
+      # обновления и ограничен этим репозиторием. Права даёт блок permissions.
+      - name: Publish to GitHub Packages
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish --tag "${{ steps.release.outputs.npm-tag }}"
