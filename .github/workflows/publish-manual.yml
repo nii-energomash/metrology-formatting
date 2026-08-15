@@ -101,9 +101,9 @@ jobs:
       - name: ✨ Setup Node.js
         uses: actions/setup-node@v4
         with:
-            node-version: '20'
-            registry-url: https://npm.pkg.github.com
-            scope: '@nii-energomash'
+          node-version: '22'
+          registry-url: https://npm.pkg.github.com
+          scope: '@nii-energomash'
 
       - name: 🚀 Publish package to Github Registry
         run: npm publish --tag "${{ inputs.npm_tag }}"

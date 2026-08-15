@@ -9,6 +9,7 @@
   "bracketSameLine": false,
   "tabWidth": 2,
   "arrowParens": "avoid",
+  "proseWrap": "preserve",
   "endOfLine": "lf",
   "htmlWhitespaceSensitivity": "ignore"
 }

@@ -7,7 +7,7 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 export default defineConfig([
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{js,mjs,jsx,vue}'],
+    files: ['**/*.{js,mjs}'],
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
@@ -24,12 +24,7 @@ export default defineConfig([
 
   {
     ...pluginVitest.configs.recommended,
-    files: [
-      'tests/**/*',
-      '**/*.test.js',
-      '**/*.spec.js',
-      'src/**/__tests__/**/*',
-    ],
+    files: ['tests/**/*.test.js'],
   },
 
   eslintConfigPrettier,
@@ -41,6 +36,21 @@ export default defineConfig([
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-alert': 'error',
       'no-debugger': 'error',
+      'no-return-await': 'error',
+    },
+  },
+
+  {
+    name: 'app/node-scripts',
+    files: ['*.config.js', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      // Вывод в консоль — это и есть интерфейс скриптов сборки.
+      'no-console': 'off',
     },
   },
 ])

@@ -3,56 +3,56 @@
 name: Continuous Integration
 
 on:
-    push:
-        branches: ['**']
-    workflow_call:
-      inputs:
-        ref:
-          required: false
-          type: string
-          default: ''
-          description: 'Имя тега для сборки (например, v1.2.3), ветки или коммита. Если не указано, используется текущий ref'
+  push:
+    branches: ['**']
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
+        default: ''
+        description: 'Имя тега для сборки (например, v1.2.3), ветки или коммита. Если не указано, используется текущий ref'
 
 jobs:
-    run-ci:
-        runs-on: ubuntu-latest
+  run-ci:
+    runs-on: ubuntu-latest
 
-        steps:
-          - name: 🛒 Checkout with param
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0
-              ref: ${{ inputs.ref || github.ref }}
+    steps:
+      - name: 🛒 Checkout with param
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref || github.ref }}
 
-          - name: Validate checked-out ref
-            run: |
-              git rev-parse HEAD
-              git status --porcelain
+      - name: Validate checked-out ref
+        run: |
+          git rev-parse HEAD
+          git status --porcelain
 
-          - name: ✨ Setup Node.js
-            uses: actions/setup-node@v4
-            with:
-                node-version: '20'
-                cache: 'npm'
+      - name: ✨ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
-          - name: 📦 Install dependencies
-            run: npm ci
+      - name: 📦 Install dependencies
+        run: npm ci
 
-          - name: 📝 Lint
-            run: npm run lint
+      - name: 📝 Lint
+        run: npm run lint
 
-          - name: 🏗️ Build and cache
-            id: cache-build
-            uses: actions/cache@v4
-            with:
-              path: dist/
-              key: build-${{ github.sha }}-${{ hashFiles('src/**', 'package.json') }}
-              restore-keys: |
-                build-
+      - name: 🏗️ Build and cache
+        id: cache-build
+        uses: actions/cache@v4
+        with:
+          path: dist/
+          key: build-${{ github.sha }}-${{ hashFiles('src/**', 'package.json') }}
+          restore-keys: |
+            build-
 
-          - name: 🛠️ Build if cache missed
-            if: steps.cache-build.outputs.cache-hit != 'true'
-            run: npm run build
+      - name: 🛠️ Build if cache missed
+        if: steps.cache-build.outputs.cache-hit != 'true'
+        run: npm run build
 
-          - name: 🧪 Run tests
-            run: npm test
+      - name: 🧪 Run tests
+        run: npm test
