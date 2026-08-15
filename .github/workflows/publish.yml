@@ -63,8 +63,11 @@ jobs:
           tag: ${{ github.ref_name }}
           prerelease: ${{ github.event.release.prerelease }}
 
-      - name: Build
-        run: npm run build
+      # test:dist собирает пакет через pretest:dist и сразу проверяет точки входа
+      # собранного dist: publint такие дефекты не ловит, а юнит-тесты гоняют src.
+      # Публикуется тот же dist, что и проверен.
+      - name: Сборка и проверка точек входа
+        run: npm run test:dist
 
       # Встроенный токен вместо PAT: он не истекает, не требует ручного
       # обновления и ограничен этим репозиторием. Права даёт блок permissions.

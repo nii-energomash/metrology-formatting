@@ -33,5 +33,8 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build
-        run: npm run build
+      # test:dist собирает пакет через pretest:dist и сразу проверяет точки
+      # входа собранного dist: publint такие дефекты не ловит, а юнит-тесты
+      # гоняют src и до dist не доходят.
+      - name: Build and check package entry points
+        run: npm run test:dist
