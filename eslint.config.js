@@ -24,7 +24,7 @@ export default defineConfig([
 
   {
     ...pluginVitest.configs.recommended,
-    files: ['tests/**/*.test.js'],
+    files: ['tests/**/*.test.js', 'tests-dist/**/*.test.js'],
   },
 
   eslintConfigPrettier,

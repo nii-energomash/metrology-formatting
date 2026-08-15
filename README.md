@@ -28,6 +28,22 @@ console.log(FormattingUtility.toPercentageString(65.432)) // "65,4%"
 console.log(FormattingUtility.toPercentageString(0.03)) // "0,0%" (правило < 0.05%)
 ```
 
+## Подключение в браузере без сборщика
+
+В пакете есть отдельная браузерная сборка `dist/index.iife.js`. Её достаточно
+скопировать в статику проекта и подключить тегом — библиотека объявляет глобаль
+`metrologyFormatting`:
+
+```html
+<script src="/vendor/metrology-formatting.js"></script>
+<script>
+  console.log(metrologyFormatting.FormattingUtility.toStandardFormString(4520))
+</script>
+```
+
+Проектам со сборщиком этот файл не нужен: `import` и `require` берут ESM- и
+CJS-сборки сами.
+
 ## API
 
 ### toStandardFormString(value: number): string

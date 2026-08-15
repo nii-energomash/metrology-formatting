@@ -26,9 +26,10 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
-    }
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./browser": "./dist/index.iife.js"
   },
   "files": [
     "dist"
@@ -39,6 +40,8 @@
     "build": "vite build",
     "postbuild": "npm run lint:publish",
     "test": "vitest run",
+    "pretest:dist": "npm run build",
+    "test:dist": "vitest run --config vitest.dist.config.js",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
