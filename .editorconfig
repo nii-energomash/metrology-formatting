@@ -1,13 +1,31 @@
-end_of_line = lf
-max_line_length = 100
+# Не искать .editorconfig в родительских каталогах
+root = true
 
-[*.{js,jsx,json,mjs,cjs,ts,tsx,mts,cts,vue,css,scss,sass,less,styl}]
+# Параметры по умолчанию для всех файлов
+[*]
 charset = utf-8
-indent_size = 2
-indent_style = space
+end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+max_line_length = 80
+
+# JavaScript/TypeScript
+[*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}]
+indent_size = 2
+
+# JSON/YAML/Markdown
+[*.json]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
-max_line_length = 80
+max_line_length = 0
+
+# Windows-скрипты
+[*.{bat,cmd,ps1}]
+end_of_line = crlf

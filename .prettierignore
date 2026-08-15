@@ -1,10 +1,10 @@
-node_modules
-dist
-coverage
-*.log
-.env
-.github/
-.gitea/
-*.yml
-*.yaml
+node_modules/
+dist/
+dist-ssr/
+coverage/
 package-lock.json
+*.log
+
+# Локальные конфигурационные файлы
+.env
+.env.*
