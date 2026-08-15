@@ -1,10 +1,10 @@
 # @nii-energomash/metrology-formatting
 
-Библиотека для строгого форматирования числовых значений по правилам метрологии: стандартная форма, объектное представление и проценты. Гарантирует три значащих цифры в выводе и корректное представление процентов.
-
 [![License](https://img.shields.io/static/v1?label=license&message=proprietary&color=blue)](https://github.com/nii-energomash/metrology-formatting/blob/master/LICENSE)
 [![CI](https://github.com/nii-energomash/metrology-formatting/actions/workflows/ci.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/ci.yml)
-[![Package](https://github.com/nii-energomash/metrology-formatting/actions/workflows/package.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/package.yml)
+[![Publish](https://github.com/nii-energomash/metrology-formatting/actions/workflows/publish.yml/badge.svg)](https://github.com/nii-energomash/metrology-formatting/actions/workflows/publish.yml)
+
+Библиотека для строгого форматирования числовых значений по правилам метрологии: стандартная форма, объектное представление и проценты. Гарантирует три значащих цифры в выводе и корректное представление процентов.
 
 Основной функционал доступен через класс `FormattingUtility`.
 
@@ -165,8 +165,12 @@ npm run format
 
 ### Версионирование
 
-Для указания версии **не следует** изменять файл манифеста.
-Версия пакета будет извлечена из тега git (вида `v*.*.*`) и добавлена в процессе CI/CD workflow.
+Для указания версии **не следует** изменять файл манифеста: в git там всегда `0.0.0`.
+Версия пакета извлекается из тега git (вида `v*.*.*`) и проставляется в процессе CI/CD workflow.
+
+Публикация запускается созданием GitHub Release на теге, а не пушем тега:
+релиз — преднамеренный акт с release notes. Повторный прогон делается кнопкой
+Re-run на этом релизе.
 
 ## Лицензия
 

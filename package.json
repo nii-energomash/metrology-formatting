@@ -1,6 +1,6 @@
 {
   "name": "@nii-energomash/metrology-formatting",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "Форматирование чисел по метрологическим правилам",
   "keywords": [
     "formatting",
@@ -35,7 +35,9 @@
   ],
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run format:check",
     "build": "vite build",
+    "postbuild": "npm run lint:publish",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
