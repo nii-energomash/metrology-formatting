@@ -1,4 +1,4 @@
-import { parseNumericOrThrow, roundTo } from './numeric'
+import { parseNumeric, roundTo } from './numeric'
 
 // Знак снимается один раз, в toStandardFormParts, и ниже его не существует:
 // форму представления определяет только величина. Поэтому toExponentialParts
@@ -100,16 +100,17 @@ function toStandardFormObjectOrThrow(numericValue) {
  * @returns {Object} Стандартное представление числа { sign, mantissa, base, exponent }, содержащее строки
  */
 export function toStandardFormObject(value) {
-  try {
-    return toStandardFormObjectOrThrow(parseNumericOrThrow(value))
-  } catch {
+  const numericValue = parseNumeric(value)
+
+  if (numericValue === null)
     return {
       sign: '',
       mantissa: '',
       base: '',
       exponent: '',
     }
-  }
+
+  return toStandardFormObjectOrThrow(numericValue)
 }
 
 /**

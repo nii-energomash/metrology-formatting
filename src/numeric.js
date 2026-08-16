@@ -1,18 +1,18 @@
 /**
  * Приводит значение к числу, пригодному для форматирования
  * @param {*} value Значение для разбора
- * @returns {Number} Числовое представление значения
- * @throws {Error} Если значение не может быть представлено числом
+ * @returns {Number|null} Числовое представление значения либо null, если значение непригодно
  */
-export function parseNumericOrThrow(value) {
+export function parseNumeric(value) {
   // Глобальный isFinite приводит аргумент к числу, в отличие от Number.isFinite,
   // и потому пропускает числа, записанные строкой, — это поддержанный вход.
-  if (!isFinite(value))
-    throw new Error('Значение не может быть представлено числом')
+  if (!isFinite(value)) return null
 
   const numericValue = parseFloat(value)
 
-  if (isNaN(numericValue)) throw new Error('Значение является NaN')
+  // Проверка не избыточна: '', null и [] проходят isFinite как ноль,
+  // но parseFloat даёт по ним NaN.
+  if (isNaN(numericValue)) return null
 
   return numericValue
 }
