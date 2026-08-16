@@ -1,4 +1,4 @@
-import { parseNumericOrThrow } from './numeric'
+import { parseNumeric } from './numeric'
 
 /**
  * Вывод процента с точностью до 1 знака после запятой
@@ -6,9 +6,9 @@ import { parseNumericOrThrow } from './numeric'
  * @returns {String} Строка в процентах, либо пустая строка для непригодного значения
  */
 export function toPercentageString(value) {
-  try {
-    return parseNumericOrThrow(value).toFixed(1)
-  } catch {
-    return ''
-  }
+  const numericValue = parseNumeric(value)
+
+  if (numericValue === null) return ''
+
+  return numericValue.toFixed(1)
 }
