@@ -1,37 +1,13 @@
-import FormattedPercentage from './FormattedPercentage'
-import FormattedNumber from './FormattedNumber'
+import { toPercentageString } from './percentage'
+import { toStandardFormObject, toStandardFormString } from './standardForm'
 
 /**
- * Форматирование значений в указанный формат
+ * Форматирование значений в указанный формат.
+ *
+ * Неймспейс-объект по образцу Math и JSON: экземпляров у него не бывает.
  */
-export default class FormattingUtility {
-  /**
-   * Вывод числа в виде строки в процентном формате
-   * @param {*} number Значение для форматирования
-   * @returns Строка в процентах
-   */
-  static toPercentageString(number) {
-    const percentagesString = new FormattedPercentage(number)
-    return percentagesString.toString()
-  }
-
-  /**
-   * Вывод числа в виде строки в стандартном виде
-   * @param {*} number Значение для форматирования
-   * @returns Строка в стандартном виде
-   */
-  static toStandardFormString(number) {
-    const formattedNumber = new FormattedNumber(number)
-    return formattedNumber.toString()
-  }
-
-  /**
-   * Вывод числа в виде объекта в стандартном виде
-   * @param {*} number Значение для форматирования
-   * @returns Объект в стандартном виде { sign, mantissa, base, exponent }, содержащий строки
-   */
-  static toStandardFormObject(number) {
-    const formattedNumber = new FormattedNumber(number)
-    return formattedNumber.toObjectValue()
-  }
-}
+export default Object.freeze({
+  toPercentageString,
+  toStandardFormString,
+  toStandardFormObject,
+})
