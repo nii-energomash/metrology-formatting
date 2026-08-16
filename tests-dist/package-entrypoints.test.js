@@ -8,16 +8,25 @@ import { describe, expect, it } from 'vitest'
 const require = createRequire(import.meta.url)
 const packageName = '@nii-energomash/metrology-formatting'
 
+const publicExports = [
+  'FormattingUtility',
+  'toPercentageString',
+  'toStandardFormObject',
+  'toStandardFormString',
+]
+
 describe('точки входа собранного пакета', () => {
   // createRequire обращается к загрузчику Node в обход конвейера Vite: только
   // так видно, что при "type": "module" Node читает файл как ESM или как CJS.
-  it('require отдаёт FormattingUtility', () => {
-    expect(Object.keys(require(packageName))).toContain('FormattingUtility')
+  it('require отдаёт публичные экспорты', () => {
+    expect(Object.keys(require(packageName))).toEqual(
+      expect.arrayContaining(publicExports)
+    )
   })
 
-  it('import отдаёт FormattingUtility', async () => {
-    expect(Object.keys(await import(packageName))).toContain(
-      'FormattingUtility'
+  it('import отдаёт публичные экспорты', async () => {
+    expect(Object.keys(await import(packageName))).toEqual(
+      expect.arrayContaining(publicExports)
     )
   })
 
@@ -31,6 +40,8 @@ describe('точки входа собранного пакета', () => {
     const context = createContext({})
     runInContext(source, context)
 
-    expect(context.metrologyFormatting).toHaveProperty('FormattingUtility')
+    expect(Object.keys(context.metrologyFormatting)).toEqual(
+      expect.arrayContaining(publicExports)
+    )
   })
 })
