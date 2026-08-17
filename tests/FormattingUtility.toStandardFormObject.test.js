@@ -118,6 +118,30 @@ describe('Передаем корректные значения', () => {
     expect(result.exponent).toBe('3')
   })
 
+  it('9995 -> {"1.00×10^4"}. Округление мантиссы даёт перенос, поднять порядок', () => {
+    const result = FormattingUtility.toStandardFormObject(9995)
+    expect(result.sign).toBe('')
+    expect(result.mantissa).toBe('1.00')
+    expect(result.base).toBe('10')
+    expect(result.exponent).toBe('4')
+  })
+
+  it('99950 -> {"1.00×10^5"}. Округление мантиссы даёт перенос, поднять порядок', () => {
+    const result = FormattingUtility.toStandardFormObject(99950)
+    expect(result.sign).toBe('')
+    expect(result.mantissa).toBe('1.00')
+    expect(result.base).toBe('10')
+    expect(result.exponent).toBe('5')
+  })
+
+  it('1004.5 -> {"1.00×10^3"}. Округление выполняется от исходного числа, а не от целого', () => {
+    const result = FormattingUtility.toStandardFormObject(1004.5)
+    expect(result.sign).toBe('')
+    expect(result.mantissa).toBe('1.00')
+    expect(result.base).toBe('10')
+    expect(result.exponent).toBe('3')
+  })
+
   it('123.45 -> {"123"}. Число > 100, вернуть целое число', () => {
     const result = FormattingUtility.toStandardFormObject(123.45)
     expect(result.sign).toBe('')
@@ -244,5 +268,13 @@ describe('Передаем корректные значения', () => {
     expect(result.mantissa).toBe('1.23')
     expect(result.base).toBe('10')
     expect(result.exponent).toBe('-2')
+  })
+
+  it('0.00009995 -> {"1.00×10^-4"}. Округление мантиссы даёт перенос, поднять порядок', () => {
+    const result = FormattingUtility.toStandardFormObject(0.00009995)
+    expect(result.sign).toBe('')
+    expect(result.mantissa).toBe('1.00')
+    expect(result.base).toBe('10')
+    expect(result.exponent).toBe('-4')
   })
 })

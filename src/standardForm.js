@@ -1,10 +1,10 @@
-import { parseNumeric, roundTo } from './numeric'
+import { parseNumeric, roundTo, splitExponential } from './numeric'
 
 // Знак снимается один раз, в toStandardFormParts, и ниже его не существует:
 // форму представления определяет только величина. Поэтому toExponentialParts
-// и toPlainParts принимают величину, а не число — подача им отрицательного не
-// даст ни исключения, ни неверного ответа, а подвесит поток на цикле
-// в toExponentialParts.
+// и toPlainParts принимают величину, а не число — подача им отрицательного
+// не даст ни исключения, ни верного ответа: знак уедет в мантиссу, и вызывающий
+// припишет к ней второй.
 
 /**
  * Раскладывает величину на мантиссу и десятичный порядок
@@ -13,28 +13,21 @@ import { parseNumeric, roundTo } from './numeric'
  * @throws {Error} Если величина равна нулю
  */
 function toExponentialParts(absValue) {
-  // Не только запрет бессмысленной операции: на нуле цикл ниже не завершится,
-  // потому что умножение нуля на десять из диапазона [0, 1) не выводит.
+  // Разложение нуля молчит: (0).toExponential() даёт "0e+0", то есть нулевую
+  // мантиссу вместо величины из [1, 10). Стандартного вида у нуля нет.
   if (absValue === 0)
     throw new Error('Невозможно представить ноль в стандартном виде')
 
-  let mantissa = absValue
-  let exponent = 0
+  const { mantissa, exponent } = splitExponential(absValue)
 
-  // Приведение к диапазону [1, 10): число шагов и есть десятичный порядок
-  if (mantissa < 1) {
-    while (mantissa < 1) {
-      mantissa *= 10
-      exponent--
-    }
-  } else {
-    while (mantissa >= 10) {
-      mantissa /= 10
-      exponent++
-    }
-  }
+  // Округление до двух знаков может дать перенос через разряд: 9.995 -> 10.
+  // Мантисса стандартного вида лежит в [1, 10), поэтому перенос уходит
+  // в порядок. Результат переноса всегда ровно десять, делить нечего.
+  const roundedMantissa = roundTo(mantissa, 2)
 
-  return { mantissa, decimalPlaces: 2, base: 10, exponent }
+  return roundedMantissa < 10
+    ? { mantissa: roundedMantissa, decimalPlaces: 2, base: 10, exponent }
+    : { mantissa: 1, decimalPlaces: 2, base: 10, exponent: exponent + 1 }
 }
 
 /**
@@ -73,7 +66,10 @@ function toStandardFormParts(numericValue) {
   const roundedToInteger = roundTo(absValue, 0)
   if (roundedToInteger < 1000) return toPlainParts(roundedToInteger, 0)
 
-  return toExponentialParts(roundedToInteger)
+  // В экспоненциальную ветку уходит исходная величина, а не округлённая:
+  // округление до нужного числа значащих цифр выполняется за один шаг,
+  // ступенчатое накапливает смещение — 1004.5 через целое даёт 1.01×10^3.
+  return toExponentialParts(absValue)
 }
 
 /**
