@@ -38,7 +38,7 @@ describe('Передаем корректные значения в виде с�
 })
 
 describe('Передаем корректные значения', () => {
-  it('-2.16 -> "-2.2". Отрицательное число, вернуть число, округленное по банковским правилам в большую сторону', () => {
+  it('-2.16 -> "-2.2". Отрицательное число, вернуть число, округлённое в большую по величине сторону', () => {
     expect(FormattingUtility.toPercentageString(-2.16)).toBe('-2.2')
   })
 
@@ -58,11 +58,46 @@ describe('Передаем корректные значения', () => {
     expect(FormattingUtility.toPercentageString(2.1)).toBe('2.1')
   })
 
-  it('2.15 -> "2.1". Число содержит сотые доли, вернуть число, округленное по банковским правилам в меньшую сторону', () => {
-    expect(FormattingUtility.toPercentageString(2.15)).toBe('2.1')
+  it('2.15 -> "2.2". Ровно середина интервала, округлить от нуля', () => {
+    expect(FormattingUtility.toPercentageString(2.15)).toBe('2.2')
   })
 
-  it('2.16 -> "2.2". Число содержит сотые доли, вернуть число, округленное по банковским правилам в большую сторону', () => {
+  it('2.16 -> "2.2". Число содержит сотые доли, вернуть число, округлённое в большую сторону', () => {
     expect(FormattingUtility.toPercentageString(2.16)).toBe('2.2')
+  })
+})
+
+describe('Округляем середину интервала', () => {
+  // Точечная проверка на 2.15 закрывает один случай из четырёхсот: середины,
+  // не представимые в двоичной плавающей точке точно, расходятся вразнобой.
+  // Поэтому проверяется вся тысяча середин сразу.
+  it('0.05 … 99.95 -> округление от нуля на всех серединах', () => {
+    const failures = []
+
+    for (let hundredths = 5; hundredths <= 9995; hundredths += 10) {
+      const value = (hundredths / 100).toFixed(2)
+      const expected = (Math.floor((hundredths + 5) / 10) / 10).toFixed(1)
+      const actual = FormattingUtility.toPercentageString(Number(value))
+
+      if (actual !== expected)
+        failures.push(`${value} -> ${actual}, ожидалось ${expected}`)
+    }
+
+    expect(failures).toEqual([])
+  })
+
+  it('-99.95 … -0.05 -> округление от нуля на всех серединах', () => {
+    const failures = []
+
+    for (let hundredths = 5; hundredths <= 9995; hundredths += 10) {
+      const value = (-hundredths / 100).toFixed(2)
+      const expected = `-${(Math.floor((hundredths + 5) / 10) / 10).toFixed(1)}`
+      const actual = FormattingUtility.toPercentageString(Number(value))
+
+      if (actual !== expected)
+        failures.push(`${value} -> ${actual}, ожидалось ${expected}`)
+    }
+
+    expect(failures).toEqual([])
   })
 })

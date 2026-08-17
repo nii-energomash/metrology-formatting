@@ -77,6 +77,18 @@ function toStandardFormParts(numericValue) {
 }
 
 /**
+ * Записывает мантиссу строкой с заданным количеством знаков после запятой
+ * @param {Number} mantissa Мантисса числом
+ * @param {Number} decimalPlaces Количество знаков после запятой
+ * @returns {String} Мантисса строкой
+ */
+function formatMantissa(mantissa, decimalPlaces) {
+  // Округление выполняет roundTo, toFixed остаётся только дописать знаки:
+  // сам по себе он округляет двоичное значение, а не десятичное.
+  return roundTo(mantissa, decimalPlaces).toFixed(decimalPlaces)
+}
+
+/**
  * Собирает представление числа строками
  * @param {Number} numericValue Разобранное число, любого знака
  * @returns {Object} Стандартное представление числа { sign, mantissa, base, exponent }
@@ -88,7 +100,7 @@ function toStandardFormObjectOrThrow(numericValue) {
 
   return {
     sign: numericValue < 0 ? '-' : '',
-    mantissa: mantissa.toFixed(mantissa != 0 ? decimalPlaces : 2),
+    mantissa: formatMantissa(mantissa, mantissa != 0 ? decimalPlaces : 2),
     base: base === null ? '' : String(base),
     exponent: exponent === null ? '' : String(exponent),
   }
