@@ -143,6 +143,8 @@ describe('Передаем корректные значения', () => {
   })
 
   it('0.00009995 -> "1.00×10^-4". Округление мантиссы даёт перенос, поднять порядок', () => {
-    expect(FormattingUtility.toStandardFormString(0.00009995)).toBe('1.00×10^-4')
+    expect(FormattingUtility.toStandardFormString(0.00009995)).toBe(
+      '1.00×10^-4'
+    )
   })
 })
