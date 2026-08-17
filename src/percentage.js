@@ -1,4 +1,4 @@
-import { parseNumeric } from './numeric'
+import { parseNumeric, roundTo } from './numeric'
 
 /**
  * Вывод процента с точностью до 1 знака после запятой
@@ -10,5 +10,7 @@ export function toPercentageString(value) {
 
   if (numericValue === null) return ''
 
-  return numericValue.toFixed(1)
+  // Округление выполняет roundTo, toFixed остаётся только дописать знак:
+  // сам по себе он округляет двоичное значение, а не десятичное.
+  return roundTo(numericValue, 1).toFixed(1)
 }
