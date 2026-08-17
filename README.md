@@ -68,7 +68,10 @@ CJS-сборки сами.
 
 ## API
 
-### toStandardFormString(value: number): string
+Все три функции принимают вторым необязательным аргументом объект настроек:
+на сегодня в нём одно поле — [`roundingMode`](#правило-округления).
+
+### toStandardFormString(value: number, options?: { roundingMode?: string }): string
 
 Функция принимает числовое значение и возвращает его строковое представление по правилам метрологии:
 
@@ -114,7 +117,7 @@ CJS-сборки сами.
 
 Пример: 0.0282 → "2.82×10^-2"
 
-### toStandardFormObject(value: number): StandardFormObject
+### toStandardFormObject(value: number, options?: { roundingMode?: string }): StandardFormObject
 
 Функция принимает числовое значение и обрабатывает его по тем же правилам, что и toStandardFormString(). Но возвращает объект вида:
 
@@ -130,7 +133,7 @@ CJS-сборки сами.
 Все четыре поля — строки. Когда представление обходится без порядка, `base` и `exponent`
 пусты; для неположительного знака `sign` пуст. На непригодном входе пусты все четыре поля.
 
-### toPercentageString(value: number): string
+### toPercentageString(value: number, options?: { roundingMode?: string }): string
 
 Функция принимает числовое значение и обрабатывает его по правилам метрологии для процентов:
 
@@ -147,6 +150,40 @@ CJS-сборки сами.
 65.432 → "65.4"
 
 0.03 → "0.0"
+
+### Правило округления
+
+Единственного «правильного» правила округления у библиотеки нет: соответствия
+какому-либо стандарту она не заявляет. Поэтому правило задаётся вызывающим —
+полем `roundingMode` в объекте настроек:
+
+```js
+toPercentageString(2.25) // "2.3" — правило по умолчанию
+toPercentageString(2.25, { roundingMode: 'halfEven' }) // "2.2" — банковское
+toPercentageString(2.29, { roundingMode: 'trunc' }) // "2.2" — усечение
+```
+
+Допустимые значения — те же, что у
+[`Intl.NumberFormat`](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#roundingmode):
+`ceil`, `floor`, `expand`, `trunc`, `halfCeil`, `halfFloor`, `halfExpand`,
+`halfTrunc`, `halfEven`. Свой список библиотека не заводит и округление
+выполняет тем же `Intl.NumberFormat`, поэтому неизвестное значение приводит
+к `RangeError` от самой платформы.
+
+По умолчанию действует `halfExpand` — округление от нуля, в том числе ровно
+на середине интервала: `2.25 → "2.3"`, `-2.25 → "-2.3"`.
+
+Правила `ceil`, `floor`, `halfCeil` и `halfFloor` отсчитывают направление
+от знака, а не от нуля, и на отрицательных значениях расходятся с `expand`
+и `trunc`: `-2.113` даёт `"-2.12"` при `floor` и `"-2.11"` при `trunc`.
+
+В стандартной форме правило влияет не только на цифры, но и на выбор формы
+записи — порог сравнивается с уже округлённым значением:
+
+```js
+toStandardFormString(0.0999) // "0.100"
+toStandardFormString(0.0999, { roundingMode: 'trunc' }) // "9.99×10^-2"
+```
 
 ## Примеры работы
 

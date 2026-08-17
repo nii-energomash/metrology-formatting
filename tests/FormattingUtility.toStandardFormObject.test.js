@@ -278,3 +278,53 @@ describe('Передаем корректные значения', () => {
     expect(result.exponent).toBe('-4')
   })
 })
+
+describe('Задаём правило округления', () => {
+  it('Когда опции не переданы, округлять по halfExpand', () => {
+    expect(FormattingUtility.toStandardFormObject(9.995)).toEqual(
+      FormattingUtility.toStandardFormObject(9.995, {
+        roundingMode: 'halfExpand',
+      })
+    )
+  })
+
+  it('9.995 -> {"9.99"} по trunc. Переноса через разряд не происходит', () => {
+    const result = FormattingUtility.toStandardFormObject(9.995, {
+      roundingMode: 'trunc',
+    })
+    expect(result.sign).toBe('')
+    expect(result.mantissa).toBe('9.99')
+    expect(result.base).toBe('')
+    expect(result.exponent).toBe('')
+  })
+
+  it('0.00009995 -> {"9.99×10^-5"} по trunc. Переноса нет, порядок не поднимается', () => {
+    const result = FormattingUtility.toStandardFormObject(0.00009995, {
+      roundingMode: 'trunc',
+    })
+    expect(result.sign).toBe('')
+    expect(result.mantissa).toBe('9.99')
+    expect(result.base).toBe('10')
+    expect(result.exponent).toBe('-5')
+  })
+
+  // Знак снимается до выбора формы записи, поэтому правило, отсчитанное
+  // от знака, переписывается на равносильное беззнаковое.
+  it('-0.0999 -> {"0.100"} по floor. Порог 0.1 достигнут, остаться в десятичной записи', () => {
+    const result = FormattingUtility.toStandardFormObject(-0.0999, {
+      roundingMode: 'floor',
+    })
+    expect(result.sign).toBe('-')
+    expect(result.mantissa).toBe('0.100')
+    expect(result.base).toBe('')
+    expect(result.exponent).toBe('')
+  })
+
+  it('Когда правило неизвестно, бросить RangeError', () => {
+    expect(() =>
+      FormattingUtility.toStandardFormObject(9.995, {
+        roundingMode: 'halfeven',
+      })
+    ).toThrow(RangeError)
+  })
+})

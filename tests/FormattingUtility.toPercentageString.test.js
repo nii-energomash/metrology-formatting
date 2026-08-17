@@ -67,6 +67,65 @@ describe('Передаем корректные значения', () => {
   })
 })
 
+describe('Задаём правило округления', () => {
+  it('Когда опции не переданы, округлять по halfExpand', () => {
+    expect(FormattingUtility.toPercentageString(2.15)).toBe(
+      FormattingUtility.toPercentageString(2.15, {
+        roundingMode: 'halfExpand',
+      })
+    )
+  })
+
+  it('Когда объект опций пуст, округлять по правилу по умолчанию', () => {
+    expect(FormattingUtility.toPercentageString(2.15, {})).toBe('2.2')
+  })
+
+  it('2.25 -> "2.2" по halfEven. Середина уходит к чётной цифре', () => {
+    expect(
+      FormattingUtility.toPercentageString(2.25, { roundingMode: 'halfEven' })
+    ).toBe('2.2')
+  })
+
+  it('2.15 -> "2.2" по halfEven. Середина уходит к чётной цифре вверх', () => {
+    expect(
+      FormattingUtility.toPercentageString(2.15, { roundingMode: 'halfEven' })
+    ).toBe('2.2')
+  })
+
+  it('2.19 -> "2.1" по trunc. Дробная часть отбрасывается', () => {
+    expect(
+      FormattingUtility.toPercentageString(2.19, { roundingMode: 'trunc' })
+    ).toBe('2.1')
+  })
+
+  it('-2.19 -> "-2.1" по trunc. Усечение идёт к нулю независимо от знака', () => {
+    expect(
+      FormattingUtility.toPercentageString(-2.19, { roundingMode: 'trunc' })
+    ).toBe('-2.1')
+  })
+
+  // Правила ceil и floor отсчитывают направление от знака, а не от нуля,
+  // поэтому на отрицательном они расходятся с trunc и expand. Пара проверок
+  // ниже ловит подмену знака величиной.
+  it('-2.11 -> "-2.2" по floor. Направление отсчитывается от знака', () => {
+    expect(
+      FormattingUtility.toPercentageString(-2.11, { roundingMode: 'floor' })
+    ).toBe('-2.2')
+  })
+
+  it('-2.19 -> "-2.1" по ceil. Направление отсчитывается от знака', () => {
+    expect(
+      FormattingUtility.toPercentageString(-2.19, { roundingMode: 'ceil' })
+    ).toBe('-2.1')
+  })
+
+  it('Когда правило неизвестно, бросить RangeError', () => {
+    expect(() =>
+      FormattingUtility.toPercentageString(2.15, { roundingMode: 'halfeven' })
+    ).toThrow(RangeError)
+  })
+})
+
 describe('Округляем середину интервала', () => {
   // Точечная проверка на 2.15 закрывает один случай из четырёхсот: середины,
   // не представимые в двоичной плавающей точке точно, расходятся вразнобой.

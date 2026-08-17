@@ -148,3 +148,73 @@ describe('Передаем корректные значения', () => {
     )
   })
 })
+
+describe('Задаём правило округления', () => {
+  it('Когда опции не переданы, округлять по halfExpand', () => {
+    expect(FormattingUtility.toStandardFormString(9.995)).toBe(
+      FormattingUtility.toStandardFormString(9.995, {
+        roundingMode: 'halfExpand',
+      })
+    )
+  })
+
+  it('Когда объект опций пуст, округлять по правилу по умолчанию', () => {
+    expect(FormattingUtility.toStandardFormString(9.995, {})).toBe('10.0')
+  })
+
+  it('9.995 -> "9.99" по trunc. Переноса через разряд не происходит', () => {
+    expect(
+      FormattingUtility.toStandardFormString(9.995, { roundingMode: 'trunc' })
+    ).toBe('9.99')
+  })
+
+  it('2.113 -> "2.12" по ceil. Округление идёт вверх', () => {
+    expect(
+      FormattingUtility.toStandardFormString(2.113, { roundingMode: 'ceil' })
+    ).toBe('2.12')
+  })
+
+  // Знак снимается до выбора формы записи, поэтому правило, отсчитанное
+  // от знака, переписывается на равносильное беззнаковое. Проверки ниже ловят
+  // подмену знака величиной: по величине -2.113 и 2.113 неразличимы,
+  // а floor обязан развести их в разные стороны.
+  it('-2.113 -> "-2.12" по floor. Направление отсчитывается от знака', () => {
+    expect(
+      FormattingUtility.toStandardFormString(-2.113, { roundingMode: 'floor' })
+    ).toBe('-2.12')
+  })
+
+  it('-2.113 -> "-2.11" по trunc. Усечение идёт к нулю независимо от знака', () => {
+    expect(
+      FormattingUtility.toStandardFormString(-2.113, { roundingMode: 'trunc' })
+    ).toBe('-2.11')
+  })
+
+  it('-9.995 -> "-10.0" по floor. Перенос через разряд на отрицательном', () => {
+    expect(
+      FormattingUtility.toStandardFormString(-9.995, { roundingMode: 'floor' })
+    ).toBe('-10.0')
+  })
+
+  // Форму записи выбирает округлённая величина, поэтому правило способно
+  // перевести число из десятичной ветки в экспоненциальную и обратно.
+  it('0.0999 -> "9.99×10^-2" по trunc. Порог 0.1 не достигнут, уйти в стандартный вид', () => {
+    expect(
+      FormattingUtility.toStandardFormString(0.0999, { roundingMode: 'trunc' })
+    ).toBe('9.99×10^-2')
+  })
+
+  it('-0.0999 -> "-0.100" по floor. Порог 0.1 достигнут, остаться в десятичной записи', () => {
+    expect(
+      FormattingUtility.toStandardFormString(-0.0999, { roundingMode: 'floor' })
+    ).toBe('-0.100')
+  })
+
+  it('Когда правило неизвестно, бросить RangeError', () => {
+    expect(() =>
+      FormattingUtility.toStandardFormString(9.995, {
+        roundingMode: 'halfeven',
+      })
+    ).toThrow(RangeError)
+  })
+})
