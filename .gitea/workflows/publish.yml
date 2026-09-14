@@ -19,14 +19,14 @@ permissions:
   packages: write
 
 env:
+  # Active LTS: с 28.10.2025, EOL 28.04.2028
+  NODE_VERSION: '24.x'
   REGISTRY_URL: 'https://${{ vars.REGISTRY_HOST }}/api/packages/${{ vars.REGISTRY_OWNER }}/npm/'
   NPM_SCOPE: '@nii-energomash'
 
 jobs:
   publish:
-    # Метку node-24 раннер отображает на образ node:24-bookworm.
-    # Active LTS: с 28.10.2025, EOL 28.04.2028.
-    runs-on: node-24
+    runs-on: ubuntu-latest
 
     steps:
       # fetch-depth: 0 — нужен полный список тегов: dist-tag latest достаётся
@@ -42,6 +42,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
           registry-url: ${{ env.REGISTRY_URL }}
           scope: ${{ env.NPM_SCOPE }}
