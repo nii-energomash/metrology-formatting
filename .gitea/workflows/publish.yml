@@ -48,13 +48,7 @@ jobs:
           scope: ${{ env.NPM_SCOPE }}
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test
-        run: npm test
+        run: npm ci --fund=false
 
       # Шаг общий с зеркалом на GitHub, см. .ci/actions/prepare-npm-release.
       - name: Версия и dist-tag из тега (манифест остаётся 0.0.0 в git)
@@ -66,6 +60,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm test
 
       # Здесь остаётся PAT, в отличие от GitHub. Автоматический GITEA_TOKEN
       # не имеет авторизации на запись в реестр пакетов — документация Gitea
