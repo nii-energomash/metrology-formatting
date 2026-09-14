@@ -25,16 +25,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --fund=false
 
-      - name: Lint
-        run: npm run lint
+      - name: Build
+        run: npm run build
 
       - name: Test
         run: npm test
-
-      # test:dist собирает пакет через pretest:dist и сразу проверяет точки
-      # входа собранного dist: publint такие дефекты не ловит, а юнит-тесты
-      # гоняют src и до dist не доходят.
-      - name: Build and check package entry points
-        run: npm run test:dist

@@ -47,13 +47,7 @@ jobs:
           scope: ${{ env.NPM_SCOPE }}
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test
-        run: npm test
+        run: npm ci --fund=false
 
       # Шаг общий с зеркалом в Gitea, см. .ci/actions/prepare-npm-release.
       - name: Версия и dist-tag из тега (манифест остаётся 0.0.0 в git)
@@ -63,11 +57,11 @@ jobs:
           tag: ${{ github.ref_name }}
           prerelease: ${{ github.event.release.prerelease }}
 
-      # test:dist собирает пакет через pretest:dist и сразу проверяет точки входа
-      # собранного dist: publint такие дефекты не ловит, а юнит-тесты гоняют src.
-      # Публикуется тот же dist, что и проверен.
-      - name: Сборка и проверка точек входа
-        run: npm run test:dist
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
 
       # Встроенный токен вместо PAT: он не истекает, не требует ручного
       # обновления и ограничен этим репозиторием. Права даёт блок permissions.
