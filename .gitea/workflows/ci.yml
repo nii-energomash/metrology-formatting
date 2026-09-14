@@ -8,17 +8,20 @@ on:
 
 jobs:
   build:
-    # Метку node-24 раннер отображает на образ node:24-bookworm.
-    # Active LTS: с 28.10.2025, EOL 28.04.2028.
-    runs-on: node-24
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v7
         with:
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
