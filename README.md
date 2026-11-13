@@ -257,6 +257,10 @@ toStandardFormString(0.0999) // '0.100'
 toStandardFormString(0.0999, { roundingMode: 'trunc' }) // '9.99·10⁻²'
 ```
 
+## Изменения
+
+История версий — в [CHANGELOG.md](./CHANGELOG.md), руководства по переходу на новую старшую версию — в заметках [релизов](https://github.com/nii-energomash/metrology-formatting/releases).
+
 ## Разработка
 
 Сборка, проверки, тесты, демонстрационная страница и выпуск версий — в [CONTRIBUTING.md](./CONTRIBUTING.md).
