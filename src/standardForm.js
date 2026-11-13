@@ -5,6 +5,7 @@ import {
   splitExponential,
   toUnsignedRoundingMode,
 } from './numeric'
+import { joinNumber, resolveSymbols, toSuperscript } from './symbols'
 
 // Знак снимается один раз, в toStandardFormParts, и ниже его не существует:
 // форму представления определяет только величина. Поэтому toExponentialParts
@@ -147,24 +148,43 @@ export function toStandardFormObject(value, { roundingMode } = {}) {
 
 /**
  * Возвращает строковое представление числа в стандартном виде или в обычном виде в зависимости от величины числа
+ *
+ * По умолчанию разделитель — точка, минус — дефис, порядок надстрочный, знак умножения — точка: 4.52·10³.
+ * Для обратного разбора служит запись e (4.52e3), её понимает Number().
+ * HTML-разметку функция не порождает — для неё есть toStandardFormObject.
  * @param {*} value Значение для форматирования
  * @param {Object} [options] Настройки форматирования
  * @param {String} [options.roundingMode] Правило округления, значения те же, что у Intl.NumberFormat
+ * @param {String} [options.decimal] Десятичный разделитель, по умолчанию '.'
+ * @param {String} [options.minusSign] Знак минуса, по умолчанию '-'
+ * @param {String} [options.invalid] Текст для непригодного значения, по умолчанию ''
+ * @param {String} [options.exponentSeparator] Знак между мантиссой и основанием, по умолчанию '·' (U+00B7); в записи e не используется
+ * @param {String} [options.exponentStyle] Запись порядка: 'superscript' (10⁻², по умолчанию), 'caret' (10^-2) или 'e' (e-2)
+ * @param {String} [options.exponentMinusSign] Минус в порядке, по умолчанию '⁻' при superscript и '-' в остальных записях
  * @returns {String} Строковое представление числа
- * @throws {RangeError} Если правило округления неизвестно
+ * @throws {RangeError} Если правило округления или способ записи порядка неизвестны
  */
 export function toStandardFormString(value, options) {
-  const { negative, integer, fraction, base, exponentNegative, exponent } =
-    toStandardFormObject(value, options)
+  const symbols = resolveSymbols(options)
+  const parts = toStandardFormObject(value, options)
 
-  if (!integer) return ''
+  if (!parts.integer) return symbols.invalid
 
-  const sign = negative ? '-' : ''
-  const mantissa = fraction ? `${integer}.${fraction}` : integer
+  const mantissa = joinNumber(parts, symbols)
 
-  if (!exponent) return `${sign}${mantissa}`
+  if (!parts.exponent) return mantissa
 
-  const exponentSign = exponentNegative ? '-' : ''
+  const exponentSign = parts.exponentNegative ? symbols.exponentMinusSign : ''
 
-  return `${sign}${mantissa}×${base}^${exponentSign}${exponent}`
+  // Буква e заменяет весь фрагмент «×10^», как exponentSeparator в Intl:
+  // ни разделитель, ни основание в этой записи не выводятся.
+  if (symbols.exponentStyle === 'e')
+    return `${mantissa}e${exponentSign}${parts.exponent}`
+
+  const power =
+    symbols.exponentStyle === 'superscript'
+      ? `${exponentSign}${toSuperscript(parts.exponent)}`
+      : `^${exponentSign}${parts.exponent}`
+
+  return `${mantissa}${symbols.exponentSeparator}${parts.base}${power}`
 }
