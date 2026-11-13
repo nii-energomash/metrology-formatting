@@ -46,32 +46,32 @@ describe('Передаем корректные значения', () => {
     expect(FormattingUtility.toStandardFormString(0)).toBe('0.00')
   })
 
-  it('-12345 -> "1.23×10^4". Число < 1000, вернуть в стандартном виде', () => {
-    expect(FormattingUtility.toStandardFormString(-12345)).toBe('-1.23×10^4')
+  it('-12345 -> "1.23·10⁴". Число < 1000, вернуть в стандартном виде', () => {
+    expect(FormattingUtility.toStandardFormString(-12345)).toBe('-1.23·10⁴')
   })
 
-  it('12345 -> "1.23×10^4". Число > 1000, вернуть в стандартном виде', () => {
-    expect(FormattingUtility.toStandardFormString(12345)).toBe('1.23×10^4')
+  it('12345 -> "1.23·10⁴". Число > 1000, вернуть в стандартном виде', () => {
+    expect(FormattingUtility.toStandardFormString(12345)).toBe('1.23·10⁴')
   })
 
-  it('1000 -> "1.00×10^3". Число = 1000, вернуть в стандартном виде', () => {
-    expect(FormattingUtility.toStandardFormString(1000)).toBe('1.00×10^3')
+  it('1000 -> "1.00·10³". Число = 1000, вернуть в стандартном виде', () => {
+    expect(FormattingUtility.toStandardFormString(1000)).toBe('1.00·10³')
   })
 
-  it('999.99 -> "1.00×10^3". Число менее 1000 на 0.01, вернуть в стандартном виде', () => {
-    expect(FormattingUtility.toStandardFormString(999.99)).toBe('1.00×10^3')
+  it('999.99 -> "1.00·10³". Число менее 1000 на 0.01, вернуть в стандартном виде', () => {
+    expect(FormattingUtility.toStandardFormString(999.99)).toBe('1.00·10³')
   })
 
-  it('9995 -> "1.00×10^4". Округление мантиссы даёт перенос, поднять порядок', () => {
-    expect(FormattingUtility.toStandardFormString(9995)).toBe('1.00×10^4')
+  it('9995 -> "1.00·10⁴". Округление мантиссы даёт перенос, поднять порядок', () => {
+    expect(FormattingUtility.toStandardFormString(9995)).toBe('1.00·10⁴')
   })
 
-  it('99950 -> "1.00×10^5". Округление мантиссы даёт перенос, поднять порядок', () => {
-    expect(FormattingUtility.toStandardFormString(99950)).toBe('1.00×10^5')
+  it('99950 -> "1.00·10⁵". Округление мантиссы даёт перенос, поднять порядок', () => {
+    expect(FormattingUtility.toStandardFormString(99950)).toBe('1.00·10⁵')
   })
 
-  it('1004.5 -> "1.00×10^3". Округление выполняется от исходного числа, а не от целого', () => {
-    expect(FormattingUtility.toStandardFormString(1004.5)).toBe('1.00×10^3')
+  it('1004.5 -> "1.00·10³". Округление выполняется от исходного числа, а не от целого', () => {
+    expect(FormattingUtility.toStandardFormString(1004.5)).toBe('1.00·10³')
   })
 
   it('123.45 -> "123". Число > 100, вернуть целое число', () => {
@@ -138,14 +138,12 @@ describe('Передаем корректные значения', () => {
     expect(FormattingUtility.toStandardFormString(0.0999)).toBe('0.100')
   })
 
-  it('0.012345 -> "1.23×10^-2". Число менее 0.1, вернуть в стандартном виде', () => {
-    expect(FormattingUtility.toStandardFormString(0.012345)).toBe('1.23×10^-2')
+  it('0.012345 -> "1.23·10⁻²". Число менее 0.1, вернуть в стандартном виде', () => {
+    expect(FormattingUtility.toStandardFormString(0.012345)).toBe('1.23·10⁻²')
   })
 
-  it('0.00009995 -> "1.00×10^-4". Округление мантиссы даёт перенос, поднять порядок', () => {
-    expect(FormattingUtility.toStandardFormString(0.00009995)).toBe(
-      '1.00×10^-4'
-    )
+  it('0.00009995 -> "1.00·10⁻⁴". Округление мантиссы даёт перенос, поднять порядок', () => {
+    expect(FormattingUtility.toStandardFormString(0.00009995)).toBe('1.00·10⁻⁴')
   })
 })
 
@@ -198,10 +196,10 @@ describe('Задаём правило округления', () => {
 
   // Форму записи выбирает округлённая величина, поэтому правило способно
   // перевести число из десятичной ветки в экспоненциальную и обратно.
-  it('0.0999 -> "9.99×10^-2" по trunc. Порог 0.1 не достигнут, уйти в стандартный вид', () => {
+  it('0.0999 -> "9.99·10⁻²" по trunc. Порог 0.1 не достигнут, уйти в стандартный вид', () => {
     expect(
       FormattingUtility.toStandardFormString(0.0999, { roundingMode: 'trunc' })
-    ).toBe('9.99×10^-2')
+    ).toBe('9.99·10⁻²')
   })
 
   it('-0.0999 -> "-0.100" по floor. Порог 0.1 достигнут, остаться в десятичной записи', () => {
@@ -216,5 +214,142 @@ describe('Задаём правило округления', () => {
         roundingMode: 'halfeven',
       })
     ).toThrow(RangeError)
+  })
+})
+
+describe('Задаём типографику', () => {
+  const toString = FormattingUtility.toStandardFormString
+
+  it('Когда символы не заданы, порядок надстрочный, разделитель — точка, минус — дефис', () => {
+    expect(toString(-0.0282, {})).toBe('-2.82·10⁻²')
+  })
+
+  it('decimal: "," -> запятая в мантиссе', () => {
+    expect(toString(3.7812, { decimal: ',' })).toBe('3,78')
+  })
+
+  it('decimal не появляется в целом числе', () => {
+    expect(toString(123.45, { decimal: ',' })).toBe('123')
+  })
+
+  it('decimal: "," -> ноль записывается с запятой', () => {
+    expect(toString(0, { decimal: ',' })).toBe('0,00')
+  })
+
+  it('minusSign: U+2212 -> минус мантиссы, порядок не затронут', () => {
+    expect(toString(-0.0282, { minusSign: '\u2212' })).toBe('\u22122.82·10⁻²')
+  })
+
+  it('exponentMinusSign: U+2212 -> минус порядка, мантисса не затронута', () => {
+    expect(toString(-0.0282, { exponentMinusSign: '\u2212' })).toBe(
+      '-2.82·10\u2212²'
+    )
+  })
+
+  it('exponentStyle: "caret" -> порядок через ^ и дефис', () => {
+    expect(toString(-0.0282, { exponentStyle: 'caret' })).toBe('-2.82·10^-2')
+    expect(toString(4520, { exponentStyle: 'caret' })).toBe('4.52·10^3')
+  })
+
+  it('exponentStyle: "caret" с exponentMinusSign: U+2212', () => {
+    expect(
+      toString(0.0282, { exponentStyle: 'caret', exponentMinusSign: '\u2212' })
+    ).toBe('2.82·10^\u22122')
+  })
+
+  it('exponentStyle: "e" -> экспоненциальная запись без разделителя и основания', () => {
+    expect(toString(4520, { exponentStyle: 'e' })).toBe('4.52e3')
+    expect(toString(-0.0282, { exponentStyle: 'e' })).toBe('-2.82e-2')
+  })
+
+  it('exponentStyle: "e" -> запись без порядка не меняется', () => {
+    expect(toString(24.567, { exponentStyle: 'e' })).toBe('24.6')
+    expect(toString(0, { exponentStyle: 'e' })).toBe('0.00')
+  })
+
+  it('exponentStyle: "e" -> exponentSeparator не используется', () => {
+    expect(toString(4520, { exponentStyle: 'e', exponentSeparator: '×' })).toBe(
+      '4.52e3'
+    )
+  })
+
+  it('exponentStyle: "e" -> вывод разбирается Number() в округлённое значение', () => {
+    expect(Number(toString(4520, { exponentStyle: 'e' }))).toBe(4520)
+    expect(Number(toString(-0.0282, { exponentStyle: 'e' }))).toBe(-0.0282)
+    expect(Number(toString(0.00009995, { exponentStyle: 'e' }))).toBe(0.0001)
+  })
+
+  it('exponentSeparator: "×" -> крест умножения перед основанием', () => {
+    expect(toString(4520, { exponentSeparator: '×' })).toBe('4.52×10³')
+  })
+
+  it('exponentStyle: "superscript" -> порядок надстрочными цифрами, без ^', () => {
+    expect(toString(4520, { exponentStyle: 'superscript' })).toBe(
+      '4.52·10\u00b3'
+    )
+  })
+
+  it('exponentStyle: "superscript" -> надстрочный минус по умолчанию', () => {
+    expect(toString(0.0282, { exponentStyle: 'superscript' })).toBe(
+      '2.82·10\u207b\u00b2'
+    )
+  })
+
+  it('exponentStyle: "superscript" -> все десять цифр надстрочные', () => {
+    expect(toString(1.23e-45, { exponentStyle: 'superscript' })).toBe(
+      '1.23·10\u207b\u2074\u2075'
+    )
+    expect(toString(1.23e-67, { exponentStyle: 'superscript' })).toBe(
+      '1.23·10\u207b\u2076\u2077'
+    )
+    expect(toString(1.23e-89, { exponentStyle: 'superscript' })).toBe(
+      '1.23·10\u207b\u2078\u2079'
+    )
+    expect(toString(1.23e-10, { exponentStyle: 'superscript' })).toBe(
+      '1.23·10\u207b\u00b9\u2070'
+    )
+  })
+
+  it('exponentMinusSign перекрывает надстрочный минус по умолчанию', () => {
+    expect(
+      toString(0.0282, { exponentStyle: 'superscript', exponentMinusSign: '-' })
+    ).toBe('2.82·10-\u00b2')
+  })
+
+  it('Все символы вместе', () => {
+    expect(
+      toString(-0.0282, {
+        decimal: ',',
+        minusSign: '\u2212',
+        exponentSeparator: '·',
+        exponentStyle: 'superscript',
+      })
+    ).toBe('\u22122,82·10\u207b\u00b2')
+  })
+
+  it('Символы сочетаются с правилом округления', () => {
+    expect(
+      toString(0.0999, {
+        roundingMode: 'trunc',
+        decimal: ',',
+        exponentStyle: 'superscript',
+      })
+    ).toBe('9,99·10\u207b\u00b2')
+  })
+
+  it('invalid -> текст для непригодного значения', () => {
+    expect(toString('asdf', { invalid: '—' })).toBe('—')
+  })
+
+  it('percentSign к стандартной форме не применяется', () => {
+    expect(toString(3.7812, { percentSign: '%' })).toBe('3.78')
+  })
+
+  it('Когда способ записи порядка неизвестен, бросить RangeError', () => {
+    expect(() => toString(4520, { exponentStyle: 'sup' })).toThrow(RangeError)
+  })
+
+  it('Неизвестный способ записи порядка отвергается и на непригодном значении', () => {
+    expect(() => toString('asdf', { exponentStyle: 'sup' })).toThrow(RangeError)
   })
 })

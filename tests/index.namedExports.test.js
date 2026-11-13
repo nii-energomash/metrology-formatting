@@ -45,12 +45,12 @@ describe('именованные экспорты вызываются напр�
     expect(toPercentageString('asdf')).toBe('')
   })
 
-  it('toStandardFormString(4520) -> "4.52×10^3"', () => {
-    expect(toStandardFormString(4520)).toBe('4.52×10^3')
+  it('toStandardFormString(4520) -> "4.52·10³"', () => {
+    expect(toStandardFormString(4520)).toBe('4.52·10³')
   })
 
-  it('toStandardFormString(0.012345) -> "1.23×10^-2"', () => {
-    expect(toStandardFormString(0.012345)).toBe('1.23×10^-2')
+  it('toStandardFormString(0.012345) -> "1.23·10⁻²"', () => {
+    expect(toStandardFormString(0.012345)).toBe('1.23·10⁻²')
   })
 
   it('toStandardFormString(0) -> "0.00"', () => {

@@ -160,3 +160,55 @@ describe('Округляем середину интервала', () => {
     expect(failures).toEqual([])
   })
 })
+
+describe('Задаём типографику', () => {
+  const toString = FormattingUtility.toPercentageString
+
+  it('Когда символы не заданы, вывод остаётся ASCII без знака процента', () => {
+    expect(toString(-2.15, {})).toBe('-2.2')
+  })
+
+  it('decimal: "," -> запятая', () => {
+    expect(toString(65.432, { decimal: ',' })).toBe('65,4')
+  })
+
+  it('minusSign: U+2212 -> типографский минус', () => {
+    expect(toString(-2.15, { minusSign: '\u2212' })).toBe('\u22122.2')
+  })
+
+  it('minusSign не появляется у нуля, полученного округлением', () => {
+    expect(toString(-0.03, { minusSign: '\u2212' })).toBe('0.0')
+  })
+
+  it('percentSign: "%" -> знак дописывается в конец', () => {
+    expect(toString(65.432, { percentSign: '%' })).toBe('65.4%')
+  })
+
+  it('percentSign: U+00A0 и % -> пробел задаётся частью значения', () => {
+    expect(toString(65.432, { percentSign: '\u00a0%' })).toBe('65.4\u00a0%')
+  })
+
+  it('Все символы вместе', () => {
+    expect(
+      toString(-2.15, { decimal: ',', minusSign: '\u2212', percentSign: ' %' })
+    ).toBe('\u22122,2 %')
+  })
+
+  it('invalid -> текст для непригодного значения, percentSign не дописывается', () => {
+    expect(toString('asdf', { invalid: '—', percentSign: '%' })).toBe('—')
+  })
+
+  it('Символы порядка к процентам не применяются', () => {
+    expect(
+      toString(65.432, {
+        exponentSeparator: '×',
+        exponentStyle: 'superscript',
+        exponentMinusSign: '\u2212',
+      })
+    ).toBe('65.4')
+  })
+
+  it('Когда способ записи порядка неизвестен, бросить RangeError', () => {
+    expect(() => toString(2.15, { exponentStyle: 'sup' })).toThrow(RangeError)
+  })
+})

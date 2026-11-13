@@ -1,4 +1,5 @@
 import { parseNumeric, roundTo, splitDigits } from './numeric'
+import { joinNumber, resolveSymbols } from './symbols'
 
 /**
  * Представление процента данными, с точностью до 1 знака после запятой
@@ -26,16 +27,24 @@ export function toPercentageObject(value, { roundingMode } = {}) {
 
 /**
  * Вывод процента с точностью до 1 знака после запятой
+ *
+ * По умолчанию вывод — ASCII: точка, дефис, без знака процента. Типографика
+ * задаётся настройками.
  * @param {*} value Значение для форматирования
  * @param {Object} [options] Настройки форматирования
  * @param {String} [options.roundingMode] Правило округления, значения те же, что у Intl.NumberFormat
- * @returns {String} Строка в процентах, либо пустая строка для непригодного значения
- * @throws {RangeError} Если правило округления неизвестно
+ * @param {String} [options.decimal] Десятичный разделитель, по умолчанию '.'
+ * @param {String} [options.minusSign] Знак минуса, по умолчанию '-'
+ * @param {String} [options.invalid] Текст для непригодного значения, по умолчанию ''
+ * @param {String} [options.percentSign] Знак процента в конце, по умолчанию ''; пробел перед ним — частью значения
+ * @returns {String} Строка в процентах, либо options.invalid для непригодного значения
+ * @throws {RangeError} Если правило округления или способ записи порядка неизвестны
  */
 export function toPercentageString(value, options) {
-  const { negative, integer, fraction } = toPercentageObject(value, options)
+  const symbols = resolveSymbols(options)
+  const parts = toPercentageObject(value, options)
 
-  if (!integer) return ''
+  if (!parts.integer) return symbols.invalid
 
-  return `${negative ? '-' : ''}${integer}.${fraction}`
+  return `${joinNumber(parts, symbols)}${symbols.percentSign}`
 }

@@ -120,6 +120,23 @@
         cursor: pointer;
       }
 
+      .symbols {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 10px 16px;
+      }
+
+      .symbols label:has(:disabled) {
+        opacity: 0.5;
+      }
+
+      .symbols label {
+        display: grid;
+        gap: 4px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
       .result {
         display: grid;
         gap: 8px;
@@ -179,6 +196,11 @@
           <label for="roundingMode">roundingMode</label>
           <select id="roundingMode"></select>
         </div>
+      </fieldset>
+
+      <fieldset id="symbolsBlock">
+        <legend>Типографика строки</legend>
+        <div class="symbols" id="symbols"></div>
       </fieldset>
 
       <fieldset class="result">
