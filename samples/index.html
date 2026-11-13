@@ -1,36 +1,201 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
-    <title>Пример форматирования</title>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Стенд форматирования</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <style>
-      .centered {
+      :root {
+        --bg: #ffffff;
+        --fg: #1f2328;
+        --muted: #59636e;
+        --border: #d1d9e0;
+        --surface: #f6f8fa;
+        --accent: #0969da;
+        color-scheme: light dark;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --fg: #e6edf3;
+          --muted: #9198a1;
+          --border: #3d444d;
+          --surface: #151b23;
+          --accent: #4493f8;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px 16px;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          15px/1.5 system-ui,
+          sans-serif;
+      }
+
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        display: grid;
+        gap: 16px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      fieldset {
+        margin: 0;
+        padding: 12px 16px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      legend {
+        padding: 0 6px;
+        color: var(--muted);
+      }
+
+      code,
+      pre,
+      input,
+      select {
+        font-family: ui-monospace, Consolas, monospace;
+      }
+
+      input[type='text'],
+      select {
+        padding: 6px 8px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--bg);
+        color: var(--fg);
+        font-size: 15px;
+      }
+
+      #value {
+        width: 100%;
+        max-width: 240px;
+      }
+
+      .row {
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px 16px;
         align-items: center;
-        flex-direction: column;
+      }
+
+      .presets {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .presets button {
+        padding: 2px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--fg);
+        font: inherit;
+        font-family: ui-monospace, Consolas, monospace;
+        cursor: pointer;
+      }
+
+      .presets button:hover {
+        border-color: var(--accent);
+      }
+
+      label {
+        cursor: pointer;
+      }
+
+      .result {
+        display: grid;
+        gap: 8px;
+      }
+
+      .caption {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      #call,
+      #output {
+        margin: 0;
+        padding: 10px 12px;
+        border-radius: 6px;
+        background: var(--surface);
+        overflow-x: auto;
+        white-space: pre;
+      }
+
+      #typeset {
+        font-size: 28px;
+      }
+
+      #typeset .invalid {
+        color: var(--muted);
+        font-size: 15px;
       }
     </style>
   </head>
 
   <body>
-    <div class="centered">
-      <input type="number" step="0.01" id="number" />
-      <div>
-        <span id="formatedPercentage"></span>
-        %
-      </div>
-      <div id="formatedNumber">&nbsp;</div>
+    <main>
+      <h1>Стенд форматирования</h1>
 
-      <div>
-        <span id="sign"></span>
-        <span id="mantissa"></span>
-        <span id="multiplication-sign"></span>
-        <span id="base"></span>
-        <sup id="exponent"></sup>
-      </div>
-    </div>
+      <fieldset>
+        <legend>Значение</legend>
+        <input
+          type="text"
+          inputmode="decimal"
+          id="value"
+          value="-0.0282"
+          autocomplete="off"
+          aria-label="Значение"
+        />
+        <div class="presets" id="presets"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Функция</legend>
+        <div class="row" id="functions"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Настройки</legend>
+        <div class="row">
+          <label for="roundingMode">roundingMode</label>
+          <select id="roundingMode"></select>
+        </div>
+      </fieldset>
+
+      <fieldset class="result">
+        <legend>Результат</legend>
+        <div class="caption">Вызов</div>
+        <pre id="call"></pre>
+        <div class="caption">Возвращено</div>
+        <pre id="output"></pre>
+        <div id="typesetBlock">
+          <div class="caption">
+            Сборка потребителем из полей объекта: запятая, минус U+2212,
+            <code>&lt;sup&gt;</code>
+          </div>
+          <div id="typeset"></div>
+        </div>
+      </fieldset>
+    </main>
 
     <script type="module" src="main.js"></script>
   </body>

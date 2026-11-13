@@ -1,4 +1,4 @@
-import { toPercentageString } from './percentage'
+import { toPercentageObject, toPercentageString } from './percentage'
 import { toStandardFormObject, toStandardFormString } from './standardForm'
 
 /**
@@ -7,6 +7,7 @@ import { toStandardFormObject, toStandardFormString } from './standardForm'
  * Неймспейс-объект по образцу Math и JSON: экземпляров у него не бывает.
  */
 export default Object.freeze({
+  toPercentageObject,
   toPercentageString,
   toStandardFormString,
   toStandardFormObject,

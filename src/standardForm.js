@@ -1,6 +1,7 @@
 import {
   parseNumeric,
   roundTo,
+  splitDigits,
   splitExponential,
   toUnsignedRoundingMode,
 } from './numeric'
@@ -85,24 +86,21 @@ function toStandardFormParts(numericValue, unsignedMode) {
   return toExponentialParts(absValue, unsignedMode)
 }
 
-/**
- * Записывает мантиссу строкой с заданным количеством знаков после запятой
- * @param {Number} mantissa Мантисса числом
- * @param {Number} decimalPlaces Количество знаков после запятой
- * @param {String} [unsignedMode] Правило округления, уже переписанное для величины
- * @returns {String} Мантисса строкой
- */
-function formatMantissa(mantissa, decimalPlaces, unsignedMode) {
-  // Округление выполняет roundTo, toFixed остаётся только дописать знаки:
-  // сам по себе он округляет двоичное значение, а не десятичное.
-  return roundTo(mantissa, decimalPlaces, unsignedMode).toFixed(decimalPlaces)
-}
+/** Объект для непригодного значения: строки пусты, признаки сброшены */
+const EMPTY_STANDARD_FORM = Object.freeze({
+  negative: false,
+  integer: '',
+  fraction: '',
+  base: '',
+  exponentNegative: false,
+  exponent: '',
+})
 
 /**
- * Собирает представление числа строками
+ * Собирает представление числа данными, без глифов
  * @param {Number} numericValue Разобранное число, любого знака
  * @param {String} [roundingMode] Правило округления, значения те же, что у Intl.NumberFormat
- * @returns {Object} Стандартное представление числа { sign, mantissa, base, exponent }
+ * @returns {Object} Стандартное представление числа { negative, integer, fraction, base, exponentNegative, exponent }
  * @throws {Error} Если число невозможно представить в стандартном виде
  * @throws {RangeError} Если правило округления неизвестно
  */
@@ -115,36 +113,34 @@ function toStandardFormObjectOrThrow(numericValue, roundingMode) {
     unsignedMode
   )
 
+  // Ноль выходит из toPlainParts с тремя знаками, а записывается с двумя: 0.00.
+  const places = mantissa != 0 ? decimalPlaces : 2
+
   return {
-    sign: isNegative ? '-' : '',
-    mantissa: formatMantissa(
-      mantissa,
-      mantissa != 0 ? decimalPlaces : 2,
-      unsignedMode
-    ),
+    negative: isNegative,
+    ...splitDigits(roundTo(mantissa, places, unsignedMode), places),
     base: base === null ? '' : String(base),
-    exponent: exponent === null ? '' : String(exponent),
+    exponentNegative: exponent !== null && exponent < 0,
+    exponent: exponent === null ? '' : String(Math.abs(exponent)),
   }
 }
 
 /**
  * Возвращает объект, содержащий представление числа в стандартном виде или в обычном виде в зависимости от величины числа
+ *
+ * Объект несёт данные, а не типографику: знаки — признаками, цифры — строками
+ * без разделителя. Какой глиф ставить для разделителя и минуса, решает тот,
+ * кто строит вывод.
  * @param {*} value Значение для форматирования
  * @param {Object} [options] Настройки форматирования
  * @param {String} [options.roundingMode] Правило округления, значения те же, что у Intl.NumberFormat
- * @returns {Object} Стандартное представление числа { sign, mantissa, base, exponent }, содержащее строки
+ * @returns {Object} Стандартное представление числа { negative, integer, fraction, base, exponentNegative, exponent }
  * @throws {RangeError} Если правило округления неизвестно
  */
 export function toStandardFormObject(value, { roundingMode } = {}) {
   const numericValue = parseNumeric(value)
 
-  if (numericValue === null)
-    return {
-      sign: '',
-      mantissa: '',
-      base: '',
-      exponent: '',
-    }
+  if (numericValue === null) return { ...EMPTY_STANDARD_FORM }
 
   return toStandardFormObjectOrThrow(numericValue, roundingMode)
 }
@@ -158,16 +154,17 @@ export function toStandardFormObject(value, { roundingMode } = {}) {
  * @throws {RangeError} Если правило округления неизвестно
  */
 export function toStandardFormString(value, options) {
-  const { sign, mantissa, base, exponent } = toStandardFormObject(
-    value,
-    options
-  )
+  const { negative, integer, fraction, base, exponentNegative, exponent } =
+    toStandardFormObject(value, options)
 
-  if (!mantissa) return ''
+  if (!integer) return ''
 
-  if (mantissa == 0) return '0.00'
+  const sign = negative ? '-' : ''
+  const mantissa = fraction ? `${integer}.${fraction}` : integer
 
-  if (!base) return `${sign}${mantissa}`
+  if (!exponent) return `${sign}${mantissa}`
 
-  return `${sign}${mantissa}×${base}^${exponent}`
+  const exponentSign = exponentNegative ? '-' : ''
+
+  return `${sign}${mantissa}×${base}^${exponentSign}${exponent}`
 }
