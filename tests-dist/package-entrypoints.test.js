@@ -10,6 +10,7 @@ const packageName = '@nii-energomash/metrology-formatting'
 
 const publicExports = [
   'FormattingUtility',
+  'toPercentageObject',
   'toPercentageString',
   'toStandardFormObject',
   'toStandardFormString',

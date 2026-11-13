@@ -126,3 +126,16 @@ export function roundTo(
   // определению зависят от знака, а не от величины.
   return Number(getFormatter(decimalPlaces, roundingMode).format(value))
 }
+
+/**
+ * Записывает величину, уже округлённую до указанной точности, цифрами целой и дробной части
+ * @param {Number} absValue Неотрицательная величина, округлённая roundTo
+ * @param {Number} decimalPlaces Количество знаков после запятой
+ * @returns {Object} Цифры строками { integer, fraction }; fraction пуст при нуле знаков
+ */
+export function splitDigits(absValue, decimalPlaces) {
+  // Округление уже выполнено roundTo, toFixed остаётся только дописать
+  // хвостовые нули: сам по себе он округляет двоичное значение, а не десятичное.
+  const [integer, fraction = ''] = absValue.toFixed(decimalPlaces).split('.')
+  return { integer, fraction }
+}

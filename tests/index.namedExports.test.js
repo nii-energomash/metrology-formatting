@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   FormattingUtility,
+  toPercentageObject,
   toPercentageString,
   toStandardFormObject,
   toStandardFormString,
@@ -10,6 +11,10 @@ import {
 // экспорт и метод неймспейса — один и тот же объект, набор проверок из
 // FormattingUtility.*.test.js распространяется на него целиком.
 describe('именованные экспорты совпадают с методами FormattingUtility', () => {
+  it('toPercentageObject', () => {
+    expect(toPercentageObject).toBe(FormattingUtility.toPercentageObject)
+  })
+
   it('toPercentageString', () => {
     expect(toPercentageString).toBe(FormattingUtility.toPercentageString)
   })
@@ -24,6 +29,14 @@ describe('именованные экспорты совпадают с мето
 })
 
 describe('именованные экспорты вызываются напрямую', () => {
+  it('toPercentageObject(-2.16) раскладывает процент на части', () => {
+    expect(toPercentageObject(-2.16)).toEqual({
+      negative: true,
+      integer: '2',
+      fraction: '2',
+    })
+  })
+
   it('toPercentageString(2.16) -> "2.2"', () => {
     expect(toPercentageString(2.16)).toBe('2.2')
   })
@@ -46,18 +59,22 @@ describe('именованные экспорты вызываются напр�
 
   it('toStandardFormObject(-12345) раскладывает число на части', () => {
     expect(toStandardFormObject(-12345)).toEqual({
-      sign: '-',
-      mantissa: '1.23',
+      negative: true,
+      integer: '1',
+      fraction: '23',
       base: '10',
+      exponentNegative: false,
       exponent: '4',
     })
   })
 
   it('toStandardFormObject("asdf") -> части пустыми строками', () => {
     expect(toStandardFormObject('asdf')).toEqual({
-      sign: '',
-      mantissa: '',
+      negative: false,
+      integer: '',
+      fraction: '',
       base: '',
+      exponentNegative: false,
       exponent: '',
     })
   })

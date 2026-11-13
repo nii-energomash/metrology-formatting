@@ -1,9 +1,10 @@
 import FormattingUtility from './FormattingUtility'
-import { toPercentageString } from './percentage'
+import { toPercentageObject, toPercentageString } from './percentage'
 import { toStandardFormObject, toStandardFormString } from './standardForm'
 
 export {
   FormattingUtility,
+  toPercentageObject,
   toPercentageString,
   toStandardFormObject,
   toStandardFormString,
